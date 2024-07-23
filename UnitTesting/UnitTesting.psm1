@@ -133,8 +133,10 @@ function Remove-PreviousCodeCoverageResults {
     )
 
     $resultsToDelete = [System.IO.Path]::Combine($testProjectFolder, "TestResults");
-    Write-Output "Deleting $resultsToDelete";
-    Remove-Item -Path $resultsToDelete -Recurse
+    if ([System.IO.Directory]::Exists($resultsToDelete)) {
+        Write-Output "Deleting $resultsToDelete";
+        Remove-Item -Path $resultsToDelete -Recurse
+    }
 }
 
 <#
@@ -173,28 +175,26 @@ function Invoke-DotnetTest {
         [Parameter(Mandatory=$false)][bool]$listTests
     )
 
-    $dotnetTestCommand = "dotnet test ";
-    $dotnetTestCommand += $absoluteTestProjectPath + " ";
-    $dotnetTestCommand += '--logger "trx;LogFileName=DotNetTestLog.trx" ';
-    if (![System.String]::IsNullOrWhiteSpace($filterString)) {
-        $dotnetTestCommand += '--filter "FullyQualifiedName~' + $filterString + '" ';
+    $argumentArray = @($absoluteTestProjectPath, "--logger", "trx;LogFileName=DotNetTestLog.trx");
+    $argumentHashTable = @{};
+    if ($listTests) {
+        $argumentArray += "--list-tests";
     }
 
     if (![System.String]::IsNullOrWhiteSpace($configuration)) {
-        $dotnetTestCommand += "--configuration $configuration ";
+        $argumentArray += "--configuration", $configuration;
     }
 
     if ($listTests) {
-        $dotnetTestCommand += "--list-tests ";
+        $argumentArray += "--list-tests";
     }
 
     if ($collectCodeCoverage) {
         $dotnetTestCommand += '--collect:"XPlat Code Coverage" ';
-        $dotnetTestCommand += "-- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover ";
+        $argumentHashTable.Add("--", "DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover");
     }
 
-    Write-Output $dotnetTestCommand;
-    Invoke-Expression $dotnetTestCommand;
+    dotnet test @argumentArray # @argumentHashTable
 }
 
 <#
