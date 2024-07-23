@@ -289,17 +289,23 @@ function Invoke-ReportGenerator {
         [Parameter(Mandatory=$false)][string]$reportGeneratorPath
     )
 
-    $argumentArray = @();
     if ([System.String]::IsNullOrWhiteSpace($coverageXmlFilename)) {
         $coverageXmlFilename = "coverage.opencover.xml";
     }
 
+    $absoluteOutputPath = [System.IO.Path]::Combine($testProjectFolder, "CodeCoverage");
+    $absoluteInputPath = [System.IO.Path]::Combine($testProjectFolder, $coverageXmlFilename);
+    $argumentArray = @(
+        "-reports:$absoluteInputPath",
+        "-targetDir:$absoluteOutputPath",
+        "-title:$testProjectName",
+        "-assemblyFilters:$assemblyUnderTest"
+    );
     if ([System.String]::IsNullOrWhiteSpace($reportGeneratorPath)) {
         $reportGeneratorPath = "$env:USERPROFILE\.nuget\packages\reportgenerator\5.2.4\tools\net6.0\reportgenerator.exe ";
     }
 
-    $absoluteOutputPath = [System.IO.Path]::Combine($testProjectFolder, "CodeCoverage");
-    $absoluteInputPath = [System.IO.Path]::Combine($testProjectFolder, $coverageXmlFilename);
-    $reportGeneratorCommand = $reportGeneratorPath + '"-reports:$absoluteInputPath" "-targetDir:$absoluteOutputPath" "-title:$testProjectName" "-assemblyFilters:+*$assemblyUnderTest"'
+    # $reportGeneratorCommand = $reportGeneratorPath + '"-reports:$absoluteInputPath" "-targetDir:$absoluteOutputPath" "-title:$testProjectName" "-assemblyFilters:+*$assemblyUnderTest"'
+    $reportGeneratorCommand = "$reportGeneratorPath @argumentArray";
     Invoke-Expression $reportGeneratorCommand;
 }
