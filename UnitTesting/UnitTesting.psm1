@@ -176,7 +176,6 @@ function Invoke-DotnetTest {
     )
 
     $argumentArray = @($absoluteTestProjectPath, "--logger", "trx;LogFileName=DotNetTestLog.trx");
-    $argumentHashTable = @{};
     if ($listTests) {
         $argumentArray += "--list-tests";
     }
@@ -185,16 +184,20 @@ function Invoke-DotnetTest {
         $argumentArray += "--configuration", $configuration;
     }
 
+    if (![System.String]::IsNullOrWhiteSpace($filterString)) {
+        $argumentArray += "--filter", "FullyQualifiedName~$filterString";
+    }
+
     if ($listTests) {
         $argumentArray += "--list-tests";
     }
 
     if ($collectCodeCoverage) {
-        $dotnetTestCommand += '--collect:"XPlat Code Coverage" ';
-        $argumentHashTable.Add("--", "DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover");
+        $argumentArray += '--collect:"XPlat Code Coverage"';
+        $argumentArray += "--", "DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover";
     }
 
-    dotnet test @argumentArray # @argumentHashTable
+    dotnet test @argumentArray @argumentHashTable
 }
 
 <#
