@@ -54,17 +54,17 @@ function Invoke-UnitTestsWithCodeAnalysis {
         $testProjectNameFilter = ".Test.csproj";
     }
 
-    $projectsToRun = Get-UnitTestProjects -interactive $interactive -projectNameFilter $testProjectNameFilter;
+    $projectsToRun = Get-UnitTestProject -interactive $interactive -projectNameFilter $testProjectNameFilter;
     $projectsToRun | ForEach-Object {
         $testProjectName = $_.Name;
         $testProjectFolder = $_.Directory.FullName;
         $testProjectFullPath = $_.FullName;
         $assemblyUnderTest = $testProjectName.Replace($testProjectNameFilter, "");
 
-        Remove-PreviousCodeCoverageResults -testProjectFolder $testProjectFolder;
+        Remove-PreviousCodeCoverageResult -testProjectFolder $testProjectFolder;
         Invoke-DotnetTest -absoluteTestProjectPath $testProjectFullPath -filterString $filterString -collectCodeCoverage -listTests $listTests;
         if ($listTestResults) {
-            Get-UnitTestResults;
+            Get-UnitTestResult;
         }
 
         Copy-CodeCoverageResultsToProjectFolder -testProjectFolder $testProjectFolder;
@@ -93,7 +93,7 @@ function Invoke-UnitTestsWithCodeAnalysis {
     If true then a dialogue box is displayed to the user inviting them to select from the discovered unit test projects.
     If false then no dialogue box is displayed and all discovered unit test projects will be run.
 #>
-function Get-UnitTestProjects {
+function Get-UnitTestProject {
     param (
         [Parameter(Mandatory=$false)][string]$projectNameFilter,
         [Parameter(Mandatory=$false)][string]$foldersToIgnore,
@@ -127,7 +127,7 @@ function Get-UnitTestProjects {
 .PARAMETER testProjectFolder
     Fully qualified path to the folder containing the unit test project.
 #>
-function Remove-PreviousCodeCoverageResults {
+function Remove-PreviousCodeCoverageResult {
     param (
         [Parameter(Mandatory=$true)][string]$testProjectFolder
     )
@@ -211,7 +211,7 @@ function Invoke-DotnetTest {
     Relative path from the project folder to the test results file.
     If not supplied, defaults to TestResults\DotNetTestLog.trx.
 #>
-function Get-UnitTestResults {
+function Get-UnitTestResult {
     param (
         [Parameter(Mandatory=$false)][string]$relativePathToTestResults
     )
@@ -289,6 +289,7 @@ function Invoke-ReportGenerator {
         [Parameter(Mandatory=$false)][string]$reportGeneratorPath
     )
 
+    $argumentArray = @();
     if ([System.String]::IsNullOrWhiteSpace($coverageXmlFilename)) {
         $coverageXmlFilename = "coverage.opencover.xml";
     }
