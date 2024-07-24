@@ -128,6 +128,7 @@ function Get-UnitTestProject {
     Fully qualified path to the folder containing the unit test project.
 #>
 function Remove-PreviousCodeCoverageResult {
+    [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory=$true)][string]$testProjectFolder
     )
