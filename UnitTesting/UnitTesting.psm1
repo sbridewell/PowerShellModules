@@ -306,6 +306,5 @@ function Invoke-ReportGenerator {
         $reportGeneratorPath = "$env:USERPROFILE\.nuget\packages\reportgenerator\5.2.4\tools\net6.0\reportgenerator.exe ";
     }
 
-    $reportGeneratorCommand = "$reportGeneratorPath $argumentArray";
-    & $reportGeneratorCommand;
+    & $reportGeneratorPath @argumentArray
 }
