@@ -306,7 +306,6 @@ function Invoke-ReportGenerator {
         $reportGeneratorPath = "$env:USERPROFILE\.nuget\packages\reportgenerator\5.2.4\tools\net6.0\reportgenerator.exe ";
     }
 
-    # $reportGeneratorCommand = $reportGeneratorPath + '"-reports:$absoluteInputPath" "-targetDir:$absoluteOutputPath" "-title:$testProjectName" "-assemblyFilters:+*$assemblyUnderTest"'
-    $reportGeneratorCommand = "$reportGeneratorPath @argumentArray";
-    Invoke-Expression $reportGeneratorCommand;
+    $reportGeneratorCommand = "$reportGeneratorPath $argumentArray";
+    & $reportGeneratorCommand;
 }
