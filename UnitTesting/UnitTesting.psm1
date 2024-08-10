@@ -68,10 +68,6 @@ function Invoke-UnitTestsWithCodeAnalysis {
         $testProjectName = $_.Name;
         $testProjectFolder = $_.Directory.FullName;
         $testProjectFullPath = $_.FullName;
-        #$projectUnderTest = $TestProjectName.Replace($TestProjectNameFilter, "");
-        # TODO: get output name from $projectUnderTest
-        #$projectFileContent = [xml](Get-Content $projectUnderTest);
-        #$assemblyUnderTest = $projectFileContent.GetElementsByTagName("AssemblyName");
         Write-Verbose "Reading content of test project $testProjectFullPath";
         $testProjectContent = [xml](Get-Content $testProjectFullPath);
         $testProjectAssemblyName = $testProjectContent.GetElementsByTagName("AssemblyName")[0].InnerText;
